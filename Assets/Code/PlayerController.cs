@@ -14,6 +14,10 @@ public class PlayerController : MonoBehaviour
     [Header("Sprint")]
     [SerializeField] private float sprintMultiplier = 1.7f;
 
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private float rotationSpeed = 10f;
+    [SerializeField] private float cameraTurnThreshold = 30f;
+
     private CharacterController controller;
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -82,11 +86,32 @@ public class PlayerController : MonoBehaviour
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
-        Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
+        Vector3 camForward = cameraTransform.forward;
+        Vector3 camRight = cameraTransform.right;
+
+        camForward.y = 0f;
+        camRight.y = 0f;
+
+        camForward.Normalize();
+        camRight.Normalize();
+
+        Vector3 move = camForward * moveInput.y + camRight * moveInput.x;
+
         float currentSpeed = isSprinting ? speed * sprintMultiplier : speed;
         controller.Move(move * currentSpeed * Time.deltaTime);
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        Vector3 forward = cameraTransform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        Quaternion targetRotation = Quaternion.LookRotation(forward);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            rotationSpeed * Time.deltaTime
+        );
     }
 }
