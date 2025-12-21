@@ -23,10 +23,14 @@ public class Move : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision collision)
-    {
-        points++;
-        Debug.Log("Collision detected with " + collision.gameObject.name);
-        Debug.Log("Points: " + points);
-        collision.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+    {        
+        if(!collision.gameObject.tag.Equals("Ground") && !collision.gameObject.tag.Equals("Hit"))
+        {
+            points++;
+            Debug.Log("Collision detected with " + collision.gameObject.name);
+            Debug.Log("Points: " + points);
+            collision.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+            collision.gameObject.tag = "Hit";
+        }
     }
 }
