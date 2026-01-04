@@ -5,9 +5,24 @@ using UnityEngine.SceneManagement;
 public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float crashDelay = 2.0f;
+    [SerializeField] AudioClip crashSound;
+    [SerializeField] AudioClip successSound;
+    [SerializeField] ParticleSystem crashParticles;
+    [SerializeField] ParticleSystem successParticles;
+
+    AudioSource audioSource;
+
+    bool isControllable = true;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
-        switch(collision.gameObject.tag)
+        if(!isControllable) { return; }
+        switch (collision.gameObject.tag)
         {
             case "Friendly": print("You get a friendly place");
                 break;
@@ -24,12 +39,20 @@ public class CollisionHandler : MonoBehaviour
 
     private void StartSuccessSequence()
     {
+        isControllable = false;
+        audioSource.Stop();
+        audioSource.PlayOneShot(successSound);
+        successParticles.Play();
         GetComponent<Movement>().enabled = false;
         Invoke(nameof(LoadNewScene), crashDelay);
     }
 
     private void StartCrashSequence()
     {
+        isControllable = false;
+        audioSource.Stop();
+        audioSource.PlayOneShot(crashSound);
+        crashParticles.Play();
         GetComponent<Movement>().enabled = false;
         Invoke(nameof(ReloadScene), crashDelay);
     }
@@ -48,7 +71,6 @@ public class CollisionHandler : MonoBehaviour
         {
             nextScene = 0;
         }
-
         SceneManager.LoadScene(nextScene);
     }
 }
