@@ -1,7 +1,10 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(CinemachineImpulseSource))]
+[RequireComponent(typeof(AudioSource))]
 public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float crashDelay = 2.0f;
@@ -14,9 +17,18 @@ public class CollisionHandler : MonoBehaviour
 
     bool isControllable = true;
 
+    public event Action OnPlayerDie;
+    public event Action OnFinishLevel;
+
+    CinemachineImpulseSource impulseSource;
+
     private void Awake()
     {
+        impulseSource = GetComponent<CinemachineImpulseSource>();
         audioSource = GetComponent<AudioSource>();
+        Debug.Assert(impulseSource != null,
+        "CollisionHandler requiere CinemachineImpulseSource",
+        this);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -39,6 +51,7 @@ public class CollisionHandler : MonoBehaviour
 
     private void StartSuccessSequence()
     {
+        OnFinishLevel?.Invoke();
         isControllable = false;
         audioSource.Stop();
         audioSource.PlayOneShot(successSound);
@@ -49,6 +62,11 @@ public class CollisionHandler : MonoBehaviour
 
     private void StartCrashSequence()
     {
+        OnPlayerDie?.Invoke();
+
+        if (impulseSource != null)
+            impulseSource.GenerateImpulse();
+
         isControllable = false;
         audioSource.Stop();
         audioSource.PlayOneShot(crashSound);
