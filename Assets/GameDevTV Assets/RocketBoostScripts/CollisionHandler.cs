@@ -1,6 +1,7 @@
 using System;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CinemachineImpulseSource))]
@@ -16,6 +17,7 @@ public class CollisionHandler : MonoBehaviour
     AudioSource audioSource;
 
     bool isControllable = true;
+    bool isCollidable = true;
 
     public event Action OnPlayerDie;
     public event Action OnFinishLevel;
@@ -31,9 +33,26 @@ public class CollisionHandler : MonoBehaviour
         this);
     }
 
+    private void Update()
+    {
+        RespondToDebugKeys();
+    }
+
+    private void RespondToDebugKeys()
+    {
+        if (Keyboard.current.lKey.wasPressedThisFrame)
+        {
+            LoadNewScene();
+        }
+        else if (Keyboard.current.cKey.wasPressedThisFrame)
+        {
+            isCollidable = !isCollidable;
+        }
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
-        if(!isControllable) { return; }
+        if(!isControllable || !isCollidable) { return; }
         switch (collision.gameObject.tag)
         {
             case "Friendly": print("You get a friendly place");

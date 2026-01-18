@@ -139,7 +139,7 @@ MonoBehaviour:
       m_Flags: 8
     m_Flags: 0
   thrustStrength: 3000
-  rotationStrenght: 100
+  rotationStrenght: 150
   mainEngine: {fileID: 8300000, guid: 9df1946edcd242640ad6103ff7cc57c7, type: 3}
   thrustParticles: {fileID: 4997142879315041991}
   leftParticles: {fileID: 1277924901918148219}
